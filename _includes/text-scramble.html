@@ -1,0 +1,66 @@
+<script>
+(function() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*~+-=.:';
+  var DURATION = 600;
+
+  function scramble(el) {
+    var final = el.textContent || '';
+    if (!final.length) return;
+
+    var w = el.offsetWidth;
+    var h = el.offsetHeight;
+    el.style.minWidth = w + 'px';
+    el.style.minHeight = h + 'px';
+    el.style.display = 'inline-block';
+
+    var start = performance.now();
+
+    function tick(now) {
+      var progress = Math.min((now - start) / DURATION, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var resolved = Math.floor(eased * final.length);
+
+      var out = '';
+      for (var i = 0; i < final.length; i++) {
+        if (i < resolved) out += final[i];
+        else if (final[i] === ' ') out += ' ';
+        else out += POOL[Math.floor(Math.random() * POOL.length)];
+      }
+
+      el.textContent = out;
+
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        el.textContent = final;
+        el.style.minWidth = '';
+        el.style.minHeight = '';
+        el.style.display = '';
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  function scrambleAll() {
+    document.querySelectorAll('.card-title').forEach(function(el, i) {
+      setTimeout(function() { scramble(el); }, i * 80);
+    });
+
+    var postTitle = document.querySelector('.post-title') || document.querySelector('#post-title');
+    if (postTitle) scramble(postTitle);
+
+    document.querySelectorAll('.profile-wrapper + * h2, .categories h2, .tag-title').forEach(function(el, i) {
+      setTimeout(function() { scramble(el); }, i * 100);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scrambleAll);
+  } else {
+    scrambleAll();
+  }
+})();
+</script>

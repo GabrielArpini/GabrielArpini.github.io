@@ -1,0 +1,100 @@
+<canvas id="ascii-bg-canvas" aria-hidden="true"></canvas>
+
+<script>
+(function() {
+  var canvas = document.getElementById('ascii-bg-canvas');
+  if (!canvas) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  var ctx = canvas.getContext('2d');
+  var CHARS = '.:+-=*#@&~<>[]|/\\';
+  var MAX_P = 30;
+  var w, h, dpr;
+
+  function getColor() {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--ascii-dim').trim() || '#2d6060';
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var particles = [];
+  function spawn(anywhere) {
+    var x, y;
+    if (anywhere) {
+      x = Math.random() * w;
+      y = Math.random() * h;
+    } else {
+      var edge = Math.floor(Math.random() * 4);
+      if (edge === 0) { x = Math.random() * w; y = -10; }
+      else if (edge === 1) { x = w + 10; y = Math.random() * h; }
+      else if (edge === 2) { x = Math.random() * w; y = h + 10; }
+      else { x = -10; y = Math.random() * h; }
+    }
+    particles.push({
+      x: x, y: y,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.2,
+      char: CHARS[Math.floor(Math.random() * CHARS.length)],
+      born: performance.now(),
+      life: 8000 + Math.random() * 6000,
+      size: 10 + Math.random() * 5
+    });
+  }
+
+  for (var i = 0; i < MAX_P; i++) spawn(true);
+
+  var visible = true;
+  document.addEventListener('visibilitychange', function() { visible = !document.hidden; });
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (!visible) return;
+
+    ctx.clearRect(0, 0, w, h);
+    var color = getColor();
+
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      var age = now - p.born;
+      if (age > p.life) { particles.splice(i, 1); continue; }
+
+      var progress = age / p.life;
+      var alpha;
+      if (progress < 0.15) alpha = progress / 0.15;
+      else if (progress > 0.85) alpha = (1 - progress) / 0.15;
+      else alpha = 1;
+
+      p.vx += (Math.random() - 0.5) * 0.008;
+      p.vy += (Math.random() - 0.5) * 0.008;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      ctx.globalAlpha = alpha * 0.07;
+      ctx.fillStyle = color;
+      ctx.font = '400 ' + p.size + 'px Georgia, Palatino, serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.char, p.x, p.y);
+    }
+    ctx.globalAlpha = 1;
+    while (particles.length < MAX_P) spawn(false);
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>

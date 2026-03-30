@@ -1,0 +1,311 @@
+<div class="ascii-hero" aria-hidden="true">
+  <canvas id="ascii-canvas"></canvas>
+</div>
+<h1 class="ascii-hero-fallback visually-hidden">Gabriel Arpini</h1>
+
+<script type="module">
+import { prepareWithSegments, layoutNextLine } from '{{ "/assets/js/pretext.bundle.js" | relative_url }}';
+
+(function() {
+  var canvas = document.getElementById('ascii-canvas');
+  var heroEl = canvas ? canvas.closest('.ascii-hero') : null;
+  var fallback = document.querySelector('.ascii-hero-fallback');
+  if (!canvas || !heroEl) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    heroEl.style.display = 'none';
+    if (fallback) fallback.classList.remove('visually-hidden');
+    return;
+  }
+
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var isMobile = window.innerWidth <= 600;
+
+  function getAccent() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--ascii-accent').trim() || '#d4a85a';
+  }
+  function getTeal() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--nvim-teal-mid').trim() || '#4a8080';
+  }
+  function getFg() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--nvim-fg').trim() || '#b0a080';
+  }
+
+  var accent = getAccent(), tealCol = getTeal(), fg = getFg();
+  var themeObs = new MutationObserver(function() {
+    accent = getAccent(); tealCol = getTeal(); fg = getFg();
+  });
+  themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
+
+  var W = heroEl.parentElement.offsetWidth;
+  var H = isMobile ? 120 : 180;
+  var FONT_SIZE = isMobile ? 7 : 8;
+  var LINE_H = Math.ceil(FONT_SIZE * 1.5);
+  var FONT = FONT_SIZE + 'px monospace';
+  var ROWS = Math.ceil(H / LINE_H);
+
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+
+  // --- Pretext: prepare a long text ---
+  var passage = 'He who has a why to live can bear almost any how. The snake which cannot cast its skin has to die.One must still have chaos in oneself to be able to give birth to a dancing star. Man is something that shall be overcome. What is great in man is that he is a bridge and not an end. Whereof one cannot speak, thereof one must be silent. The limits of my language mean the limits of my world. A picture held us captive and we could not get outside it, for it lay in our language and language seemed to repeat it to us inexorably.The world is everything that is the case. We can only see a short distance ahead, but we can see plenty there that needs to be done. A computer would deserve to be called intelligent if it could deceive a human into believing that it was human. Instead of trying to produce a programme to simulate the adult mind, why not rather try to produce one which simulates the child s. The question of whether a computer can think is no more interesting than the question of whether a submarine can swim. Information is the resolution of uncertainty. By far the greatest danger of artificial intelligence is that people conclude too early that they understand it. No computer has ever been designed that is ever aware of what it is doing, but most of the time, we are not aware either. The key to artificial intelligence has always been the representation. All things excellent are as difficult as they are rare. The highest activity a human being can attain is learning for understanding, because to understand is to be free. Desire is the very essence of man. Talent hits a target no one else can hit. Genius hits a target no one else can see. Every man takes the limits of his own field of vision for the limits of the world. People worry that computers will get too smart and take over the world, but the real problem is that they are too stupid and they have already taken over the world. Deep learning allows computational models composed of multiple processing layers to learn representations of data with multiple levels of abstraction. There are no facts, only interpretations. ';
+
+  // Repeat so we never run out
+  passage = passage + passage + passage;
+
+  var prepared = null;
+  try {
+    prepared = prepareWithSegments(passage, FONT);
+  } catch(e) {}
+
+  // --- Solar system planets ---
+  // Sizes, speeds, and orbits loosely based on real ratios
+  // Speed is relative to Earth=1, slowed way down for ambiance
+  var BASE_SPEED = 0.075;
+  var sunX = W / 2;
+  var sunY = H / 2;
+  var centerX = sunX;
+  var centerY = sunY;
+  var m = isMobile ? 0.5 : 1;
+
+  var gap = isMobile ? 4 : 6;
+  var solarSystem = [
+    { name: 'Sun',     radius: 22 * m, a: 0,   b: 0,   speed: 0,     hex: '#d4a85a', rings: 0 },
+    { name: 'Mercury', radius: 3 * m,  a: 30 * m,   b: H * 0.08, speed: 4.15,  hex: '#8a7a5a', rings: 0 },
+    { name: 'Venus',   radius: 5 * m,  a: 50 * m,   b: H * 0.12, speed: 1.62,  hex: '#c8934a', rings: 0 },
+    { name: 'Earth',   radius: 6 * m,  a: 72 * m,   b: H * 0.17, speed: 1.0,   hex: '#4a8080', rings: 0 },
+    { name: 'Mars',    radius: 4 * m,  a: 95 * m,   b: H * 0.21, speed: 0.53,  hex: '#8b3535', rings: 0 },
+    { name: 'Jupiter', radius: 14 * m, a: 135 * m,  b: H * 0.28, speed: 0.302, hex: '#c4b48a', rings: 0 },
+    { name: 'Saturn',  radius: 12 * m, a: 180 * m,  b: H * 0.34, speed: 0.122, hex: '#b8792a', rings: 1 },
+    { name: 'Uranus',  radius: 8 * m,  a: 225 * m,  b: H * 0.40, speed: 0.043, hex: '#6aadad', rings: 1 },
+    { name: 'Neptune', radius: 7 * m,  a: 270 * m,  b: H * 0.45, speed: 0.022, hex: '#2d6060', rings: 0 },
+  ];
+
+  if (isMobile) solarSystem = solarSystem.slice(0, 6);
+
+  var planets = [];
+  for (var i = 0; i < solarSystem.length; i++) {
+    var s = solarSystem[i];
+    planets.push({
+      radius: s.radius,
+      cx: centerX,
+      cy: centerY,
+      targetCy: centerY,
+      settled: true,
+      a: s.a,
+      b: s.b,
+      angle: 0,
+      speed: s.speed * BASE_SPEED,
+      hex: s.hex,
+      ringCount: s.rings,
+      isSun: s.speed === 0
+    });
+  }
+
+  // --- Name ---
+  var nameSize = isMobile ? 22 : 46;
+  var nameText = 'Gabriel Arpini';
+
+  var visible = true;
+  document.addEventListener('visibilitychange', function() { visible = !document.hidden; });
+
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!visible) return;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Update planet positions
+    var ppos = [];
+    for (var i = 0; i < planets.length; i++) {
+      var p = planets[i];
+      if (!p.settled) {
+        p.cy += (p.targetCy - p.cy) * 0.012;
+        if (Math.abs(p.cy - p.targetCy) < 0.5) p.settled = true;
+      }
+      p.angle += p.speed * 0.016;
+      ppos.push({
+        x: p.cx + p.a * Math.cos(p.angle),
+        y: p.cy + p.b * Math.sin(p.angle),
+        r: p.radius,
+        depth: Math.cos(p.angle),
+        planet: p
+      });
+    }
+
+    // --- Lay out text with pretext, line by line, with variable width per line ---
+    // Each line checks if a planet is on that row.
+    // If yes: the line width shrinks and text is offset to flow around the planet.
+    // This is what pretext is FOR — layoutNextLine with different width per row.
+    if (prepared) {
+      ctx.font = FONT;
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = fg;
+      ctx.globalAlpha = 0.3;
+
+      var cursor = { segmentIndex: 0, graphemeIndex: 0 };
+
+      for (var r = 0; r < ROWS; r++) {
+        var y = r * LINE_H;
+        var rowCenter = y + LINE_H / 2;
+
+        // Find all planets that overlap this row
+        // Compute exclusion zones (where planets block text)
+        var exclusions = []; // { left, right } in px
+        for (var pi = 0; pi < ppos.length; pi++) {
+          var pp = ppos[pi];
+          var dy = Math.abs(rowCenter - pp.y);
+          var planetR = pp.r * 1.5; // exclusion radius slightly bigger than visual
+          if (dy < planetR) {
+            // How wide is the planet at this row height
+            var halfW = Math.sqrt(planetR * planetR - dy * dy);
+            exclusions.push({
+              left: pp.x - halfW,
+              right: pp.x + halfW,
+              hex: pp.planet.hex,
+              glow: 1 - dy / planetR
+            });
+          }
+        }
+
+        // Sort exclusions left to right
+        exclusions.sort(function(a, b) { return a.left - b.left; });
+
+        // Build text regions: gaps between exclusions
+        var regions = [];
+        var x = 0;
+        for (var ei = 0; ei < exclusions.length; ei++) {
+          var ex = exclusions[ei];
+          var regionLeft = x;
+          var regionRight = Math.max(x, ex.left);
+          if (regionRight - regionLeft > 10) {
+            regions.push({ x: regionLeft, width: regionRight - regionLeft, glow: 0 });
+          }
+          x = ex.right;
+        }
+        // Remaining space after last exclusion
+        if (W - x > 10) {
+          regions.push({ x: x, width: W - x, glow: 0 });
+        }
+
+        // If no exclusions, one full-width region
+        if (exclusions.length === 0) {
+          regions = [{ x: 0, width: W, glow: 0 }];
+        }
+
+        // Mark regions near exclusions with glow
+        for (var ri = 0; ri < regions.length; ri++) {
+          for (var ei = 0; ei < exclusions.length; ei++) {
+            var ex = exclusions[ei];
+            // If this region borders an exclusion, add glow
+            if (Math.abs(regions[ri].x + regions[ri].width - ex.left) < 5 ||
+                Math.abs(regions[ri].x - ex.right) < 5) {
+              regions[ri].glow = Math.max(regions[ri].glow, ex.glow);
+              regions[ri].glowColor = ex.hex;
+            }
+          }
+        }
+
+        // Lay out text into each region using pretext layoutNextLine
+        for (var ri = 0; ri < regions.length; ri++) {
+          var reg = regions[ri];
+          var line = layoutNextLine(prepared, cursor, reg.width);
+          if (!line) {
+            // Ran out of text, loop
+            cursor = { segmentIndex: 0, graphemeIndex: 0 };
+            line = layoutNextLine(prepared, cursor, reg.width);
+            if (!line) break;
+          }
+
+          ctx.textAlign = 'left';
+
+          // Sun glow pulse: text near the sun changes to sun color in waves
+          var regCenterX = reg.x + reg.width / 2;
+          var distToSun = Math.sqrt((regCenterX - sunX) * (regCenterX - sunX) + (rowCenter - sunY) * (rowCenter - sunY));
+          var sunGlowRadius = (isMobile ? 120 : 220);
+          // Pulse wave expanding outward from sun
+          var now = performance.now() / 1000;
+          var wave = Math.sin(now * 0.8 - distToSun * 0.02) * 0.5 + 0.5; // 0..1 wave
+          var sunInfluence = distToSun < sunGlowRadius ? (1 - distToSun / sunGlowRadius) * wave : 0;
+
+          if (reg.glow > 0) {
+            ctx.fillStyle = reg.glowColor || accent;
+            ctx.globalAlpha = 0.3 + reg.glow * 0.4;
+          } else if (sunInfluence > 0.1) {
+            ctx.fillStyle = accent; // sun's amber color
+            ctx.globalAlpha = 0.3 + sunInfluence * 0.35;
+          } else {
+            ctx.fillStyle = fg;
+            ctx.globalAlpha = 0.3;
+          }
+
+          ctx.fillText(line.text, reg.x, y);
+          cursor = line.end;
+        }
+      }
+    }
+
+    // --- Draw planets ---
+    for (var i = 0; i < ppos.length; i++) {
+      var pp = ppos[i];
+      var p = pp.planet;
+      var depthScale = p.isSun ? 1 : 0.7 + 0.3 * ((pp.depth + 1) / 2);
+      var depthAlpha = p.isSun ? 1 : 0.5 + 0.5 * ((pp.depth + 1) / 2);
+      var dr = pp.r * depthScale;
+
+      // Sun glow
+      if (p.isSun) {
+        var sunGlow = ctx.createRadialGradient(pp.x, pp.y, dr * 0.5, pp.x, pp.y, dr * 2.5);
+        sunGlow.addColorStop(0, p.hex + '40');
+        sunGlow.addColorStop(1, p.hex + '00');
+        ctx.globalAlpha = 0.6;
+        ctx.fillStyle = sunGlow;
+        ctx.beginPath();
+        ctx.arc(pp.x, pp.y, dr * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = depthAlpha;
+      ctx.beginPath();
+      ctx.arc(pp.x, pp.y, dr, 0, Math.PI * 2);
+      ctx.fillStyle = p.hex;
+      ctx.fill();
+
+      var grad = ctx.createRadialGradient(pp.x - dr * 0.3, pp.y - dr * 0.3, dr * 0.05, pp.x, pp.y, dr);
+      grad.addColorStop(0, 'rgba(255,255,255,0.25)');
+      grad.addColorStop(0.6, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, p.isSun ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.5)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Rings
+      ctx.globalAlpha = depthAlpha * 0.3;
+      ctx.strokeStyle = p.hex;
+      ctx.lineWidth = 0.8;
+      for (var ri = 0; ri < p.ringCount; ri++) {
+        ctx.beginPath();
+        ctx.ellipse(pp.x, pp.y, dr * (1.5 + ri * 0.5), dr * (0.3 + ri * 0.1), 0.3 + ri * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
+    // --- Name on top, same color, readable ---
+    ctx.font = '700 ' + nameSize + 'px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = fg;
+    ctx.globalAlpha = 1;
+    ctx.fillText(nameText, isMobile ? 10 : 20, H / 2);
+
+    ctx.globalAlpha = 1;
+  }
+
+  document.fonts.ready.then(function() {
+    requestAnimationFrame(frame);
+  });
+})();
+</script>

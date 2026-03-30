@@ -1,0 +1,158 @@
+<canvas id="scroll-spark" aria-hidden="true"></canvas>
+
+<style>
+  #scroll-spark {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 40;
+  }
+</style>
+
+<script>
+(function() {
+  var canvas = document.getElementById('scroll-spark');
+  if (!canvas) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var CHARS = '.:+-=*#@$&~<>[]|/\\';
+  var BURST_COUNT = 3;
+  var PARTICLE_LIFE = 0.6;
+  var GRAVITY = 20;
+  var SCROLL_THROTTLE = 30;
+
+  function getAccent() {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--ascii-accent').trim() || '#d4a85a';
+  }
+
+  var accent = getAccent();
+  var themeObs = new MutationObserver(function() { accent = getAccent(); });
+  themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
+
+  function resize() {
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var sparks = [];
+  var touchX = -1, touchY = -1;
+  var lastBurst = 0;
+  var running = false;
+  var lastFrame = 0;
+
+  function burst(x, y, scrollDelta) {
+    var scrollSpeed = Math.min(Math.abs(scrollDelta), 200);
+    var dir = scrollDelta > 0 ? -1 : 1;
+    for (var i = 0; i < BURST_COUNT; i++) {
+      var spread = (Math.random() - 0.5) * 60;
+      var drift = dir * (60 + scrollSpeed * 0.8 + Math.random() * 40);
+      sparks.push({
+        x: x + (Math.random() - 0.5) * 10,
+        y: y + (Math.random() - 0.5) * 10,
+        vx: spread,
+        vy: drift,
+        char: CHARS[Math.floor(Math.random() * CHARS.length)],
+        life: PARTICLE_LIFE + Math.random() * 0.2,
+        maxLife: PARTICLE_LIFE + Math.random() * 0.2,
+        size: 7 + Math.random() * 4
+      });
+    }
+    if (!running) {
+      running = true;
+      lastFrame = performance.now();
+      requestAnimationFrame(frame);
+    }
+  }
+
+  function frame(now) {
+    var dt = Math.min((now - lastFrame) / 1000, 0.05);
+    lastFrame = now;
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    var alive = 0;
+
+    for (var i = sparks.length - 1; i >= 0; i--) {
+      var s = sparks[i];
+      s.life -= dt;
+      if (s.life <= 0) { sparks.splice(i, 1); continue; }
+      alive++;
+
+      s.vy += GRAVITY * dt;
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vx *= 0.98;
+      s.vy *= 0.98;
+
+      var alpha = s.life / s.maxLife;
+      ctx.globalAlpha = alpha * alpha;
+      ctx.fillStyle = accent;
+      ctx.font = '500 ' + s.size + 'px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(s.char, s.x, s.y);
+    }
+
+    ctx.globalAlpha = 1;
+    if (alive > 0) requestAnimationFrame(frame);
+    else running = false;
+  }
+
+  // Track cursor
+  window.addEventListener('mousemove', function(e) {
+    touchX = e.clientX; touchY = e.clientY;
+  }, { passive: true });
+  document.addEventListener('mouseleave', function() { touchX = -1; touchY = -1; });
+  window.addEventListener('touchstart', function(e) {
+    var t = e.touches[0]; touchX = t.clientX; touchY = t.clientY;
+  }, { passive: true });
+  window.addEventListener('touchmove', function(e) {
+    var t = e.touches[0]; touchX = t.clientX; touchY = t.clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', function() { touchX = -1; touchY = -1; });
+
+  // Scroll spark
+  var pendingWheel = 0;
+  window.addEventListener('wheel', function(e) {
+    if (touchX < 0) return;
+    pendingWheel = e.deltaY;
+    requestAnimationFrame(function() {
+      if (pendingWheel === 0) return;
+      var delta = pendingWheel;
+      pendingWheel = 0;
+      var atTop = window.scrollY <= 0 && delta < 0;
+      var atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1 && delta > 0;
+      if (atTop || atBottom) return;
+      var now = performance.now();
+      if (now - lastBurst < SCROLL_THROTTLE) return;
+      lastBurst = now;
+      burst(touchX, touchY, delta);
+    });
+  }, { passive: true });
+
+  var lastScrollY = window.scrollY;
+  window.addEventListener('scroll', function() {
+    if (touchX < 0) return;
+    var delta = window.scrollY - lastScrollY;
+    lastScrollY = window.scrollY;
+    if (Math.abs(delta) < 2) return;
+    var now = performance.now();
+    if (now - lastBurst < SCROLL_THROTTLE) return;
+    lastBurst = now;
+    burst(touchX, touchY, delta);
+  }, { passive: true });
+
+  // Clear on blur
+  window.addEventListener('blur', function() { touchX = -1; touchY = -1; });
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) { touchX = -1; touchY = -1; }
+  });
+})();
+</script>

@@ -1,0 +1,321 @@
+<section class="editorial-flow" id="editorial-flow">
+  <div class="editorial-flow__stage" id="editorial-stage">
+    <canvas id="editorial-shape-canvas"></canvas>
+  </div>
+  <div class="editorial-flow__text" id="editorial-text"></div>
+</section>
+
+<script type="module">
+import { prepareWithSegments, layoutNextLine } from '{{ "/assets/js/pretext.bundle.js" | relative_url }}';
+
+(function() {
+  const container = document.getElementById('editorial-flow');
+  const textLayer = document.getElementById('editorial-text');
+  const stageEl = document.getElementById('editorial-stage');
+  const shapeCanvas = document.getElementById('editorial-shape-canvas');
+  if (!container || !textLayer || !stageEl || !shapeCanvas) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Still show the text, just no animation
+  }
+
+  const LEFT_TEXT = "Passionate about the intersection of artificial intelligence and human cognition. Exploring how deep learning architectures mirror and extend biological neural processes. From attention mechanisms that parallel human focus to parameter-efficient fine-tuning that echoes how we adapt existing knowledge to new domains. Working at the frontier where transformers, vision models, and language understanding converge into systems that don't just process information but begin to reason about it. Every research question opens three more, and that's exactly what makes this field extraordinary.";
+
+  const RIGHT_TEXT = "Building tools and models that bridge the gap between theoretical research and practical applications. Natural language processing gives machines the ability to understand context, nuance, and intent. Computer vision teaches them to see patterns invisible to the human eye. Parameter-efficient methods like LoRA and adapters make these capabilities accessible without requiring massive computational resources. The goal isn't to replace human intelligence but to augment it, creating collaborative systems where artificial and biological cognition complement each other in ways neither could achieve alone.";
+
+  const FONT_SIZE = 17;
+  const LINE_HEIGHT = 28;
+  const FONT = `${FONT_SIZE}px Georgia, Palatino, "Times New Roman", serif`;
+  const COLUMN_GAP = 40;
+  const WRAP_GUTTER = 14;
+
+  // Animated shape parameters
+  let shapeTime = 0;
+  const SHAPE_BANDS = 24;
+
+  function getShapeProfile(time) {
+    const profile = [];
+    for (let i = 0; i < SHAPE_BANDS; i++) {
+      const t = i / (SHAPE_BANDS - 1);
+      // Coffee cup / organic blob shape that morphs over time
+      const base = 0.3 + 0.15 * Math.sin(t * Math.PI);
+      const morph = 0.04 * Math.sin(t * 4 + time * 0.8) + 0.03 * Math.cos(t * 6 - time * 0.5);
+      // Steam wisps at the top
+      const steam = t < 0.2 ? 0.08 * Math.sin(t * 20 + time * 2) * (0.2 - t) / 0.2 : 0;
+      // Handle bump on the right side
+      const handle = (t > 0.35 && t < 0.65) ? 0.06 * Math.exp(-((t - 0.5) * 10) ** 2) : 0;
+
+      profile.push({
+        width: Math.max(0.08, base + morph + Math.abs(steam) + handle),
+        offset: 0.02 * Math.sin(t * 3 + time * 0.3) + steam * 0.5,
+      });
+    }
+    return profile;
+  }
+
+  function sampleProfileBand(profile, normalizedY) {
+    const index = normalizedY * (profile.length - 1);
+    const lo = Math.max(0, Math.floor(index));
+    const hi = Math.min(profile.length - 1, lo + 1);
+    const frac = index - lo;
+    return {
+      width: profile[lo].width * (1 - frac) + profile[hi].width * frac,
+      offset: profile[lo].offset * (1 - frac) + profile[hi].offset * frac,
+    };
+  }
+
+  function computeWrapRegions(y, lineHeight, articleLeft, articleWidth, stageTop, stageHeight, stageCenterX, stageWidth, profile) {
+    const lineMid = y + lineHeight / 2;
+    const stageBottom = stageTop + stageHeight;
+
+    if (lineMid < stageTop || lineMid > stageBottom) {
+      return [{ x: articleLeft, width: articleWidth }];
+    }
+
+    const normalizedY = (lineMid - stageTop) / stageHeight;
+    const band = sampleProfileBand(profile, normalizedY);
+    const effectiveCenterX = stageCenterX + band.offset * stageWidth;
+    const halfWidth = (stageWidth * band.width) / 2;
+    const exclusionLeft = effectiveCenterX - halfWidth - WRAP_GUTTER;
+    const exclusionRight = effectiveCenterX + halfWidth + WRAP_GUTTER;
+    const articleRight = articleLeft + articleWidth;
+
+    const leftRegion = { x: articleLeft, width: Math.max(0, exclusionLeft - articleLeft) };
+    const rightRegion = { x: Math.min(articleRight, exclusionRight), width: Math.max(0, articleRight - exclusionRight) };
+
+    return [leftRegion, rightRegion].filter(r => r.width > 30);
+  }
+
+  // Draw the shape silhouette on canvas
+  function drawShape(ctx, w, h, profile, time) {
+    ctx.clearRect(0, 0, w, h);
+
+    const accentColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--ascii-accent').trim() || '#d4a85a';
+    const secondaryColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--ascii-secondary').trim() || '#4a8080';
+
+    // Draw organic shape from profile
+    ctx.beginPath();
+    const centerX = w / 2;
+    const points = [];
+
+    for (let i = 0; i < profile.length; i++) {
+      const t = i / (profile.length - 1);
+      const y = t * h;
+      const band = profile[i];
+      const halfW = (w * band.width) / 2;
+      const offsetX = band.offset * w;
+      points.push({ y, left: centerX + offsetX - halfW, right: centerX + offsetX + halfW });
+    }
+
+    // Right edge
+    ctx.moveTo(points[0].right, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const cpY = (prev.y + curr.y) / 2;
+      ctx.quadraticCurveTo(prev.right, cpY, curr.right, curr.y);
+    }
+
+    // Left edge (reversed)
+    for (let i = points.length - 1; i >= 0; i--) {
+      const curr = points[i];
+      const next = points[Math.min(points.length - 1, i + 1)];
+      const cpY = (curr.y + next.y) / 2;
+      ctx.quadraticCurveTo(next.left, cpY, curr.left, curr.y);
+    }
+
+    ctx.closePath();
+
+    // Gradient fill
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, secondaryColor + '40');
+    grad.addColorStop(0.5, accentColor + '30');
+    grad.addColorStop(1, secondaryColor + '40');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Subtle border
+    ctx.strokeStyle = accentColor + '50';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Draw ASCII chars inside the shape for texture
+    ctx.font = '10px Georgia, Palatino, serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const chars = '.:+-=*#@&~';
+    for (let row = 0; row < profile.length; row++) {
+      const t = row / (profile.length - 1);
+      const y = t * h;
+      const band = profile[row];
+      const halfW = (w * band.width) / 2;
+      const offsetX = band.offset * w;
+      const left = centerX + offsetX - halfW + 4;
+      const right = centerX + offsetX + halfW - 4;
+
+      for (let x = left; x < right; x += 12) {
+        const charIndex = Math.floor((Math.sin(x * 0.3 + y * 0.2 + time) + 1) * chars.length / 2) % chars.length;
+        const alpha = 0.15 + 0.1 * Math.sin(x * 0.1 + y * 0.1 + time * 0.5);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = accentColor;
+        ctx.fillText(chars[charIndex], x, y);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Prepare text with pretext
+  let leftPrepared = null;
+  let rightPrepared = null;
+
+  try {
+    const lp = prepareWithSegments(LEFT_TEXT, FONT);
+    leftPrepared = {
+      startCursor: { segmentIndex: 0, graphemeIndex: 0 },
+      nextLine(cursor, maxWidth) { return layoutNextLine(lp, cursor, maxWidth); }
+    };
+    const rp = prepareWithSegments(RIGHT_TEXT, FONT);
+    rightPrepared = {
+      startCursor: { segmentIndex: 0, graphemeIndex: 0 },
+      nextLine(cursor, maxWidth) { return layoutNextLine(rp, cursor, maxWidth); }
+    };
+  } catch(e) {
+    console.warn('Pretext init failed, editorial flow disabled', e);
+    return;
+  }
+
+  function layoutAndRender() {
+    const containerWidth = container.offsetWidth;
+    const isMobile = containerWidth < 500;
+
+    if (isMobile) {
+      // On mobile, just render as plain text
+      textLayer.innerHTML = '';
+      const p1 = document.createElement('p');
+      p1.className = 'editorial-flow__paragraph';
+      p1.textContent = LEFT_TEXT;
+      const p2 = document.createElement('p');
+      p2.className = 'editorial-flow__paragraph';
+      p2.textContent = RIGHT_TEXT;
+      textLayer.appendChild(p1);
+      textLayer.appendChild(p2);
+      stageEl.style.display = 'none';
+      return;
+    }
+
+    stageEl.style.display = '';
+
+    const articleLeft = 0;
+    const articleWidth = containerWidth;
+    const articleTop = 0;
+
+    const stageWidth = containerWidth * 0.28;
+    const stageHeight = 320;
+    const stageCenterX = containerWidth / 2;
+    const stageTop = 20;
+
+    // Size and position the shape canvas
+    shapeCanvas.width = Math.round(stageWidth);
+    shapeCanvas.height = Math.round(stageHeight);
+    shapeCanvas.style.width = stageWidth + 'px';
+    shapeCanvas.style.height = stageHeight + 'px';
+    stageEl.style.left = (stageCenterX - stageWidth / 2) + 'px';
+    stageEl.style.top = stageTop + 'px';
+    stageEl.style.width = stageWidth + 'px';
+    stageEl.style.height = stageHeight + 'px';
+
+    const profile = getShapeProfile(shapeTime);
+
+    // Draw shape
+    const sCtx = shapeCanvas.getContext('2d');
+    drawShape(sCtx, shapeCanvas.width, shapeCanvas.height, profile, shapeTime);
+
+    // Layout text in two columns flowing around the shape
+    const lines = [];
+    let leftCursor = leftPrepared.startCursor;
+    let rightCursor = rightPrepared.startCursor;
+    let leftDone = false;
+    let rightDone = false;
+    let y = articleTop;
+    const maxY = stageTop + stageHeight + 80;
+
+    while (y + LINE_HEIGHT <= maxY && (!leftDone || !rightDone)) {
+      const regions = computeWrapRegions(
+        y, LINE_HEIGHT, articleLeft, articleWidth,
+        stageTop, stageHeight, stageCenterX, stageWidth, profile
+      );
+
+      if (regions.length >= 2) {
+        // Two columns
+        if (!leftDone) {
+          const line = leftPrepared.nextLine(leftCursor, regions[0].width);
+          if (line === null) { leftDone = true; }
+          else {
+            lines.push({ text: line.text, x: regions[0].x, y, width: line.width, regionWidth: regions[0].width, column: 'left' });
+            leftCursor = line.end;
+          }
+        }
+        if (!rightDone) {
+          const line = rightPrepared.nextLine(rightCursor, regions[1].width);
+          if (line === null) { rightDone = true; }
+          else {
+            lines.push({ text: line.text, x: regions[1].x, y, width: line.width, regionWidth: regions[1].width, column: 'right' });
+            rightCursor = line.end;
+          }
+        }
+      } else if (regions.length === 1) {
+        // Single region, alternate columns
+        if (!leftDone) {
+          const line = leftPrepared.nextLine(leftCursor, regions[0].width);
+          if (line === null) { leftDone = true; }
+          else {
+            lines.push({ text: line.text, x: regions[0].x, y, width: line.width, regionWidth: regions[0].width, column: 'left' });
+            leftCursor = line.end;
+          }
+        }
+      }
+
+      y += LINE_HEIGHT;
+    }
+
+    // Render lines to DOM
+    textLayer.innerHTML = '';
+    for (const line of lines) {
+      const node = document.createElement('div');
+      node.className = 'editorial-flow__line';
+      node.style.left = line.x + 'px';
+      node.style.top = line.y + 'px';
+      node.style.width = line.regionWidth + 'px';
+      node.style.textAlign = line.column === 'left' ? 'right' : 'left';
+      node.textContent = line.text;
+      textLayer.appendChild(node);
+    }
+
+    // Update container height
+    const totalHeight = Math.max(y, stageTop + stageHeight) + 20;
+    container.style.height = totalHeight + 'px';
+  }
+
+  // Animate
+  let visible = true;
+  document.addEventListener('visibilitychange', () => { visible = !document.hidden; });
+
+  let lastResize = 0;
+  window.addEventListener('resize', () => { lastResize = performance.now(); });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!visible) return;
+
+    shapeTime += 0.016;
+    layoutAndRender();
+  }
+
+  // Wait for fonts
+  document.fonts.ready.then(() => {
+    requestAnimationFrame(animate);
+  });
+})();
+</script>

@@ -1,0 +1,129 @@
+---
+layout: compress
+---
+
+<!doctype html>
+
+{% include origin-type.html %}
+
+{% include lang.html %}
+
+{% if site.theme_mode %}
+  {% capture prefer_mode %}data-mode="{{ site.theme_mode }}"{% endcapture %}
+{% endif %}
+
+<html lang="{{ page.lang | default: site.alt_lang | default: site.lang }}" {{ prefer_mode }}>
+  {% include head.html %}
+
+  <body>
+    {% include scroll-spark.html %}
+    {% include ascii-background.html %}
+
+    <!-- Bufferline / tabline -->
+    <div id="nvim-bufferline">
+      <a href="{{ '/' | relative_url }}" class="nvim-buf{% if page.layout == 'home' %} nvim-buf--active{% endif %}">
+        <span class="nvim-buf-icon"></span> index
+      </a>
+      {% for tab in site.tabs %}
+        {% capture tab_name %}{{ tab.url | split: '/' }}{% endcapture %}
+        <a href="{{ tab.url | relative_url }}" class="nvim-buf{% if tab.url == page.url %} nvim-buf--active{% endif %}">
+          <span class="nvim-buf-icon"></span> {{ tab.title | downcase }}
+        </a>
+      {% endfor %}
+      <span class="nvim-bufline-fill"></span>
+    </div>
+
+    {% include sidebar.html lang=lang %}
+
+    <div id="main-wrapper" class="d-flex justify-content-center">
+      <div class="container d-flex flex-column px-xxl-5">
+        {% include topbar.html lang=lang %}
+
+        <div class="row flex-grow-1">
+          <main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4">
+            {% if layout.layout == 'default' %}
+              {% include refactor-content.html content=content lang=lang %}
+            {% else %}
+              {{ content }}
+            {% endif %}
+          </main>
+
+          <aside aria-label="Panel" id="panel-wrapper" class="col-xl-3 ps-2 text-muted">
+            <div class="access">
+              {% include_cached update-list.html lang=lang %}
+              {% include_cached trending-tags.html lang=lang %}
+            </div>
+
+            {% for _include in layout.panel_includes %}
+              {% assign _include_path = _include | append: '.html' %}
+              {% include {{ _include_path }} lang=lang %}
+            {% endfor %}
+          </aside>
+        </div>
+
+        <div class="row">
+          <div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4">
+            {% for _include in layout.tail_includes %}
+              {% assign _include_path = _include | append: '.html' %}
+              {% include {{ _include_path }} lang=lang %}
+            {% endfor %}
+
+            {% include_cached footer.html lang=lang %}
+          </div>
+        </div>
+
+        {% include_cached search-results.html lang=lang %}
+      </div>
+
+      <aside aria-label="Scroll to Top">
+        <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow">
+          <i class="fas fa-angle-up"></i>
+        </button>
+      </aside>
+    </div>
+
+    <div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div>
+
+    {% if site.pwa.enabled %}
+      {% include_cached notification.html lang=lang %}
+    {% endif %}
+
+    {% for _include in layout.script_includes %}
+      {% assign _include_path = _include | append: '.html' %}
+      {% include {{ _include_path }} %}
+    {% endfor %}
+
+    {% include_cached search-loader.html lang=lang %}
+    {% include text-scramble.html %}
+
+    <!-- Neovim statusline -->
+    <div id="nvim-statusline">
+      <span class="nvim-mode">NORMAL</span>
+      <span class="nvim-separator">│</span>
+      <span class="nvim-filename">{{ page.title | default: 'index' | downcase }}</span>
+      <span class="nvim-modified"></span>
+      <span class="nvim-statusline-fill"></span>
+      <span class="nvim-filetype">{% if page.layout == 'post' %}markdown{% elsif page.layout == 'home' %}html{% else %}{{ page.layout }}{% endif %}</span>
+      <span class="nvim-separator">│</span>
+      <span class="nvim-encoding">utf-8</span>
+      <span class="nvim-separator">│</span>
+      <span class="nvim-position" id="nvim-pos">1:1</span>
+    </div>
+
+    <script>
+    // Update statusline position on scroll
+    (function() {
+      var posEl = document.getElementById('nvim-pos');
+      if (!posEl) return;
+      var total = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      function update() {
+        var pct = Math.round((window.scrollY / total) * 100);
+        var line = Math.max(1, Math.round((window.scrollY / total) * 100));
+        posEl.textContent = pct + '%  ' + line + ':1';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+    </script>
+  </body>
+</html>
