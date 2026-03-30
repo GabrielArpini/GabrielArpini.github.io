@@ -453,9 +453,27 @@ kbd {
   margin-bottom: 1rem;
   line-height: 0;
   position: relative;
-  overflow: hidden;
   border-bottom: 1px solid var(--nvim-teal-dim);
   padding-bottom: 0.5rem;
+  min-height: 180px;
+}
+
+@media (max-width: 600px) {
+  .ascii-hero {
+    min-height: 120px;
+  }
+}
+
+#ascii-canvas {
+  display: block;
+  width: 100%;
+  min-height: 180px;
+}
+
+@media (max-width: 600px) {
+  #ascii-canvas {
+    min-height: 120px;
+  }
 }
 
 .ascii-hero-fallback {
