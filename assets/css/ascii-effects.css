@@ -80,7 +80,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: stretch;
   height: 28px;
   background: var(--nvim-bg-dark);
-  border-bottom: 1px solid var(--nvim-teal-dim);
+  border-bottom: none;
   font-size: 13px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -92,7 +92,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 14px;
   color: var(--nvim-fg-dim);
   text-decoration: none !important;
-  border-right: 1px solid var(--nvim-teal-dim);
+  border-right: none;
   white-space: nowrap;
   transition: color 0.1s, background 0.1s;
 }
@@ -130,7 +130,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 24px;
   padding: 0 12px;
   background: var(--nvim-bg-sel);
-  border-top: 1px solid var(--nvim-teal-dim);
+  border-top: none;
   font-size: 12px;
   color: var(--nvim-cream);
   gap: 0;
@@ -182,8 +182,8 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Sidebar as nvim-tree ─────────────────────────── */
 #sidebar {
   background: var(--nvim-bg-dark) !important;
-  border-right: 1px solid var(--nvim-teal-dim) !important;
-  padding-top: 32px !important; /* below bufferline */
+  border-right: none !important;
+  padding-top: 32px !important;
 }
 
 .nvim-tree-title {
@@ -191,7 +191,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   color: var(--nvim-amber);
   padding: 6px 12px;
-  border-bottom: 1px solid var(--nvim-teal-dim);
+  border-bottom: none;
   letter-spacing: 0.03em;
 }
 
@@ -280,7 +280,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Sidebar bottom */
 .sidebar-bottom {
-  border-top: 1px solid var(--nvim-teal-dim) !important;
+  border-top: none !important;
   padding: 6px 8px !important;
 }
 
@@ -301,34 +301,33 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Main content — buffer area ──────────────────── */
 body {
-  padding-top: 28px !important;  /* bufferline height */
-  padding-bottom: 24px !important; /* statusline height */
+  padding-top: 28px !important;
+  padding-bottom: 24px !important;
 }
 
 #topbar-wrapper {
-  top: 28px !important; /* push below bufferline */
-  border-bottom: 1px solid var(--nvim-teal-dim) !important;
+  top: 28px !important;
+  border-bottom: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-/* Content area — line number gutter feel */
 main {
   padding-left: 2rem !important;
-  border-left: 1px solid var(--nvim-teal-dim);
+  border-left: none;
 }
 
-/* Cards — thin border like floating windows */
+/* Cards — amber border, the blog post blocks */
 .card,
 .card-wrapper {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: 1px solid var(--nvim-amber) !important;
   background: var(--nvim-bg-dark) !important;
   margin-bottom: 6px !important;
 }
 
 .card:hover,
 .card-wrapper:hover {
-  border-color: var(--nvim-amber) !important;
+  border-color: var(--nvim-amber-mid) !important;
 }
 
 .card-body {
@@ -339,50 +338,55 @@ main {
   font-size: 1rem !important;
 }
 
-/* Tags */
+/* Tags — no border */
 .post-tag, .tag {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: none !important;
   font-size: 0.78rem !important;
   padding: 1px 6px !important;
 }
 
-/* Code — matches neovim highlight-bg */
+/* Code — no border */
 .highlight, div.highlighter-rouge {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: none !important;
 }
 
 code {
   font-family: inherit !important;
 }
 
-/* Blockquotes — sign column style */
+/* Blockquotes — amber left border */
 blockquote {
-  border-left: 2px solid var(--nvim-teal) !important;
+  border-left: 2px solid var(--nvim-amber) !important;
   padding-left: 1rem;
 }
 
-/* Buttons — minimal */
+/* Buttons — no border */
 .btn, button {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: none !important;
 }
 
 #back-to-top {
-  border: 1px solid var(--nvim-teal-dim) !important;
-  bottom: 32px !important; /* above statusline */
+  border: 1px solid var(--nvim-amber) !important;
+  bottom: 32px !important;
 }
 
-/* Footer — minimal */
+/* Footer — no border */
 footer {
-  border-top: 1px solid var(--nvim-teal-dim) !important;
+  border-top: none !important;
   font-size: 12px;
 }
 
-/* Panel */
+/* Panel — recently updated block gets amber border */
 #panel-wrapper {
-  border-left: 1px solid var(--nvim-teal-dim) !important;
+  border-left: none !important;
 }
 
-/* Search — keep default Chirpy styling, no neovim overrides */
+#panel-wrapper .access {
+  border: 1px solid var(--nvim-amber) !important;
+  padding: 0.5rem !important;
+}
+
+/* Search — amber border */
 #search,
 #search-input,
 .search-input,
@@ -395,13 +399,13 @@ footer {
 }
 
 #search-input, .search-input {
-  border: none !important;
+  border: 1px solid var(--nvim-amber) !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
 #search-input:focus, .search-input:focus {
-  border: none !important;
+  border: 1px solid var(--nvim-amber-mid) !important;
   box-shadow: none !important;
   outline: none !important;
 }
@@ -415,24 +419,24 @@ footer {
 /* Scrollbar — thin, terminal-like */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--nvim-bg-dark); }
-::-webkit-scrollbar-thumb { background: var(--nvim-teal-dim); }
-::-webkit-scrollbar-thumb:hover { background: var(--nvim-teal); }
+::-webkit-scrollbar-thumb { background: var(--nvim-bg-sel); }
+::-webkit-scrollbar-thumb:hover { background: var(--nvim-amber); }
 
 /* Pagination */
 .pagination .page-link {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: none !important;
 }
 
 /* Tables */
 .table-wrapper table,
 .table-wrapper th,
 .table-wrapper td {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: 1px solid var(--nvim-amber) !important;
 }
 
 /* kbd */
 kbd {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: none !important;
 }
 
 /* Avatar square */
@@ -442,7 +446,7 @@ kbd {
 
 /* TOC */
 #toc-wrapper, .toc-popup {
-  border: 1px solid var(--nvim-teal-dim) !important;
+  border: none !important;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -453,7 +457,7 @@ kbd {
   margin-bottom: 1rem;
   line-height: 0;
   position: relative;
-  border-bottom: 1px solid var(--nvim-teal-dim);
+  border-bottom: none;
   padding-bottom: 0.5rem;
   min-height: 180px;
   max-width: 100%;
