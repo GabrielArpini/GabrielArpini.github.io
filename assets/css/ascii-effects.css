@@ -482,10 +482,13 @@ kbd {
   }
 }
 
-.ascii-hero-fallback {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--ascii-accent);
+.ascii-hero-tagline {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--nvim-fg-dim);
+  margin: 0.5rem 0 0 0;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
 }
 
 #ascii-bg-canvas {
