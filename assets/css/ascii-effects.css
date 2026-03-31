@@ -149,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nvim-separator {
-  color: var(--nvim-teal-dim);
+  color: var(--nvim-amber);
   margin: 0 8px;
 }
 
@@ -382,7 +382,7 @@ footer {
 }
 
 #panel-wrapper .access {
-  border: 1px solid var(--nvim-amber) !important;
+  border: none !important;
   padding: 0.5rem !important;
 }
 
@@ -399,13 +399,13 @@ footer {
 }
 
 #search-input, .search-input {
-  border: 1px solid var(--nvim-amber) !important;
+  border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }
 
 #search-input:focus, .search-input:focus {
-  border: 1px solid var(--nvim-amber-mid) !important;
+  border: none !important;
   box-shadow: none !important;
   outline: none !important;
 }
