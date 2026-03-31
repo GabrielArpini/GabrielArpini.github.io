@@ -456,6 +456,8 @@ kbd {
   border-bottom: 1px solid var(--nvim-teal-dim);
   padding-bottom: 0.5rem;
   min-height: 180px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 @media (max-width: 600px) {
