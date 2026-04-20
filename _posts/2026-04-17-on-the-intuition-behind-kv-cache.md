@@ -3,6 +3,8 @@ title: On the intuition behind kv cache
 date: 2026-04-19
 categories: [inference]
 tags: [kvcache]
+redirect_from:
+  - /posts/on-building-a-kv-cache-from-scratch-lessons-from-my-inference-engine/
 ---
 
 
