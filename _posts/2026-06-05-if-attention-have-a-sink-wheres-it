@@ -23,18 +23,19 @@ The LLaMA model have a residual stream of the excess of attention directed to th
 streams is called *sink*. But, why the first token have that attention "focus point", but the others doesn't? Often, the first tokens doesn't hold
 that much significance for the remaining sequence, so why it gets all the attention?
 
-#### Where the sink came from?
-Remember Bert? That strange phenomena was seen after an analysis of the BeRT model attention[change_later](https://arxiv.org/abs/1906.04341)
-The BERT model had a tendency to hyperfocus on delimeters and periods. In other words, BERT had a sink pattern on delimeters and periods accross a sequence.
-And the fact that its delimeters and periods is not random, its a much deeper understanding of how our language works. Imagine that you have a sequence of words
-and you have an arbitrary budget of how much you can invest in each word, your boss wants to see all the budget gone at the end of the day, so you need to figure out
-how to invest broadly in each word of the sequence, while maintaining certain priorities, since our language is based accross the relationship of words in a sequence.
-So, you see a word that is very important for the overall sequence, then you invest all the word budget into that specific word, but what about a word that is not
-fully relevant for the sequence at the end? If you invest all your budget, it will have an investment that is not easy to justify and your boss will be angry. Well,
-instead of fully investing the budget into that word, you can invest a little, but use the remaining budget (your boss wants all the budget gone) into other words.
+### Where the sink came from?
 
-Essentially, that's how the residual attention streaming works, is a way of the model re manage the budget to other parts of the sequence.
-In the case of BERT, it defined that delimeter and periods are the tokens that are worth investing when it have a residual to manage.
+Remember BERT? That strange phenomena was first seen in an analysis of the BERT model's attention [change_later](https://arxiv.org/abs/1906.04341).
+
+The BERT model had a tendency to hyperfocus on delimiters and periods. In other words, BERT had a sink pattern on delimiters and periods across a sequence. And the fact that it is delimiters and periods, not random tokens, points to a deeper understanding of how our language works.
+
+Imagine that you have a sequence of words and you have an arbitrary budget of how much you can invest in each word. Your boss wants to see all the budget gone at the end of the day, so you need to figure out how to invest broadly across the sequence, while maintaining certain priorities, since our language is based across the relationship of words. You see a word that is very important for the overall sequence, you invest all the word budget there. But what about a word that is not fully relevant at the end? If you invest all your budget on it, the investment will be hard to justify and your boss will be angry. Instead, you invest a little, and you spread the remaining budget across other words. Broad coverage, priorities where they count.
+
+That is what a human accountant would do. Models do not do that.
+
+What models actually do is pick an anchor. One token where they dump the leftover budget every time, instead of spreading it across the sequence. Not "invest a little here, share the rest around", but "pile the rest onto one chosen spot".
+
+In BERT's case, the chosen anchors were delimiters and periods. And that choice is not arbitrary. Both show up reliably across every input, and periods especially carry real structural meaning in language: they mark where a sentence ends, where one block of thought stops and another begins. So the model is not just dumping at random. It is leaning on tokens that are both always-available and structurally meaningful.
 
 
 
