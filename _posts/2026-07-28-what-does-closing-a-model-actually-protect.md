@@ -1,6 +1,6 @@
 ---
 title: What does closing a model actually protect?
-date: 2026-07-25 12:00:00 -0300
+date: 2026-07-28 12:00:00 -0300
 categories: [LLM, Security]
 tags: [distillation, security]
 math: true
