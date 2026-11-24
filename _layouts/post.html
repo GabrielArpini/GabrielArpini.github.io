@@ -8,9 +8,7 @@
   {% seo %}
   <link rel="alternate" type="application/atom+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/homepage/reading.css' | relative_url }}?v={{ site.time | date: '%s' }}">
-  {% if site.toc and page.toc %}
-    <script defer src="{{ '/assets/homepage/reading.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
-  {% endif %}
+  <script defer src="{{ '/assets/homepage/reading.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
   {% if page.math %}
     {% include origin-type.html %}
     <script defer src="{{ '/assets/js/data/mathjax.js' | relative_url }}"></script>
@@ -18,9 +16,11 @@
   {% endif %}
 </head>
 <body>
-  <header class="masthead">
+  <header class="masthead" id="top" tabindex="-1">
     <span class="name">{{ site.title | escape }}</span>
-    <nav aria-label="Blog"><a class="return-button" href="{{ '/#writing' | relative_url }}">Return</a></nav>
+    <nav aria-label="Blog">
+      <a class="return-button arrow-control" href="{{ '/#writing' | relative_url }}" aria-label="Return to Writing"><span class="arrow-icon" aria-hidden="true"></span></a>
+    </nav>
   </header>
   <main>
     <article class="article" aria-labelledby="article-title">
@@ -47,5 +47,6 @@
       </div>
     </article>
   </main>
+  <a class="back-to-top arrow-control" href="#top" aria-label="Back to top" hidden><span class="arrow-icon" aria-hidden="true"></span></a>
 </body>
 </html>
