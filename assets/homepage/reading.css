@@ -33,7 +33,8 @@ a:hover { text-decoration-thickness: 2px; }
   min-height: 4.5rem;
   border-bottom: 1px solid var(--line);
 }
-.masthead .name { font-weight: 620; }
+.masthead .name { color: inherit; font-weight: 620; text-decoration: none; }
+.masthead .name:hover { text-decoration: underline; }
 .article { margin-inline: var(--gutter); padding-bottom: clamp(3rem, 8vw, 7rem); }
 .lede { max-width: 79rem; margin: auto; }
 .lede-inner { position: relative; padding: clamp(3.25rem, 9vw, 7rem) 0 clamp(2rem, 5vw, 3.5rem); }

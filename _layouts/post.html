@@ -17,7 +17,7 @@
 </head>
 <body>
   <header class="masthead" id="top" tabindex="-1">
-    <span class="name">{{ site.title | escape }}</span>
+    <a class="name" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
     <nav aria-label="Blog">
       <a class="return-button arrow-control" href="{{ '/#writing' | relative_url }}" aria-label="Return to Writing"><span class="arrow-icon" aria-hidden="true"></span></a>
     </nav>
