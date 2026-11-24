@@ -1,0 +1,187 @@
+@font-face{font-family:Archivo;src:url(archivo.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:Instrument;src:url(instrument.woff2) format("woff2");font-style:italic;font-display:swap}
+:root{--gutter:clamp(22px,6vw,108px);--mast:57px;--screen:calc(100svh - var(--mast));font-family:Archivo,Arial,sans-serif;background:#141916;color:#f1ead7}
+*,*::before,*::after{box-sizing:border-box}
+body,h1,h2,h3,p,ol,figure,blockquote{margin:0}
+a{color:inherit;text-underline-offset:4px}
+a:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+a:hover{text-decoration-thickness:2px}
+section[id]{scroll-margin-top:var(--mast)}
+.mast{height:var(--mast);position:sticky;top:0;z-index:8;display:flex;gap:15px;align-items:center;justify-content:space-between;padding:0 var(--gutter);background:#141916;color:#ebeee0;border-bottom:1px solid #c7d1b037}
+.signature{font-size:14px;font-weight:730;text-decoration:none;white-space:nowrap}
+.mast nav{height:100%;display:flex;align-items:stretch;gap:clamp(11px,3.1vw,44px);font-size:13px}
+.mast nav a{display:grid;place-items:center;position:relative;text-decoration:none;color:#d7dcce;white-space:nowrap}
+.mast nav a[aria-current],.mast nav a:hover{color:#e8f3bf}
+.mast nav a[aria-current]::after{content:"";height:2px;background:#c3df9b;position:absolute;bottom:0;left:0;right:0}
+.meter{height:1px;background:#c3df9b50;position:absolute;inset:auto 0 -1px;transform:scaleX(var(--page,0));transform-origin:left}
+.reel{position:relative;isolation:isolate}
+.hold{position:relative;min-height:var(--screen)}
+.motion .reel{min-height:calc(var(--screen) + var(--travel))}
+.motion .hold{position:sticky;top:var(--mast)}
+.label,.language h2{font-size:12px;font-weight:650;letter-spacing:.13em;text-transform:uppercase}
+.language{--travel:43svh;background:#c2c9c6;color:#182121}
+.language .hold{padding:clamp(55px,12vh,125px) var(--gutter) 97px;display:grid;align-content:center;overflow:hidden;isolation:isolate}
+.map{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.map canvas{width:100%;height:100%;display:block}
+.language-copy{max-width:min(640px,61vw)}
+.language h2{border-top:1px solid #233432;display:table;padding:9px 16px 0 0;margin-bottom:clamp(27px,5.1vh,68px);color:#243432}
+.language blockquote p{font:italic clamp(57px,7.9vw,128px)/.83 Instrument,Georgia,serif;letter-spacing:-.024em}
+.language em{color:#243432}
+.language blockquote footer{font-size:13px;margin-top:26px;color:#2d3c3a}
+.chapter-link{position:absolute;left:var(--gutter);right:var(--gutter);bottom:27px;display:flex;justify-content:space-between;align-items:center;text-decoration:none;border-top:1px solid #e0e9a747;padding-top:11px;font-size:13px}
+.chapter-link span{font-size:20px}
+.flight{--travel:250svh;background:#241a1e;color:#fff1db}
+.flight .hold{height:max(490px,var(--screen));overflow:hidden;isolation:isolate}
+.copper,.airframe,.flight-shade{position:absolute;inset:0;pointer-events:none}
+.copper{
+  background:radial-gradient(ellipse at 62% 46%,#a35541,var(--horizon,#452d36) 48%,#201b27 87%),
+  repeating-linear-gradient(90deg,transparent 0 29px,#f2bc891c 30px 31px);
+}
+.airframe{background:center/cover no-repeat url(blackbird.webp)}
+.airframe[data-render=webgl],.airframe[data-render=canvas]{background:none}
+.airframe[data-render=unavailable] canvas{display:none}
+.airframe canvas{width:100%;height:100%;display:block}
+.flight-shade{background:linear-gradient(180deg,#261b2294,transparent 39%),linear-gradient(0deg,#17131af5 0%,#26171da4 14%,transparent 41%)}
+.flight-title{position:absolute;top:clamp(31px,6vh,60px);left:var(--gutter);opacity:calc(1 - var(--phase,0) * .95);pointer-events:none}
+.flight-title h2,.night h2{font-size:clamp(58px,8.9vw,143px);line-height:.82;letter-spacing:-.075em;margin-top:18px}
+.flight-title em,.night h2 em{font:italic 1.07em/.96 Instrument,Georgia,serif;letter-spacing:-.04em;color:#f5c79e}
+.flight-notes{position:absolute;left:var(--gutter);right:var(--gutter);bottom:23px;border-top:1px solid #ffe7cc55;padding-top:15px;display:flex;gap:24px;align-items:end;justify-content:space-between}
+.flight-notes ol{display:grid;list-style:none;padding:0;font-size:clamp(15px,1.75vw,22px);line-height:1.25}
+.flight-notes li{grid-area:1/1;opacity:0;visibility:hidden;max-width:40ch}
+.flight-notes li[data-active]{opacity:1;visibility:visible}
+.flight-notes h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px;color:#fcd5a3}
+.flight-notes a{font-size:12px;white-space:nowrap}
+.night{background:#132321;color:#f3e2c6;--travel:0px}
+.night .hold{overflow:hidden;isolation:isolate;display:grid;align-content:center;padding:clamp(32px,6vh,75px) var(--gutter);grid-template-columns:minmax(255px,.74fr) minmax(0,1fr);column-gap:clamp(28px,5vw,100px)}
+.night-copy{align-self:center;z-index:1}
+.night h2{font-size:clamp(52px,7.2vw,111px)}
+.night h2 em{color:#f4cb8b}
+.hopper{align-self:center}
+.layers{position:relative;aspect-ratio:1500/819;overflow:hidden;background:#122521}
+.layers img{display:block;width:100%;height:100%;object-fit:contain;position:absolute;inset:0}
+.hopper figcaption{display:grid;gap:5px;margin-top:16px;font-size:13px;line-height:1.43;color:#e8d7b6}
+
+.archive{padding:clamp(60px,11vh,120px) var(--gutter);background:#eee6d6;color:#262721}
+.archive header{display:flex;align-items:baseline;gap:23px;flex-wrap:wrap;margin-bottom:36px}
+.archive h2{font-size:clamp(54px,8vw,122px);letter-spacing:-.073em;line-height:.9}
+.archive ol{list-style:none;padding:0;border-top:1px solid #302f2f}
+.archive li{border-bottom:1px solid #302f2f66}
+.archive li a{display:grid;grid-template-columns:8rem minmax(0,1fr) auto;align-items:baseline;gap:17px;padding:20px 0;text-decoration:none;font-size:clamp(17px,2.4vw,31px);line-height:1.22;letter-spacing:-.024em}
+.archive li a:hover span:first-of-type{text-decoration:underline}
+.archive time,.archive footer{font-size:13px;letter-spacing:0}
+.archive footer{display:flex;flex-wrap:wrap;gap:12px 25px;margin-top:28px}
+@media(max-width:760px){
+  :root{--mast:51px;--gutter:22px}
+  .mast{padding:0 14px;gap:9px}.signature{font-size:12px}.mast nav{gap:12px;font-size:11px}
+  .language .hold{padding:29px var(--gutter) 98px;align-content:end}
+  .language-copy{max-width:500px}
+  .language blockquote p{font-size:clamp(51px,10vw,92px);max-width:9.5ch}
+  .language h2{margin-bottom:24px}.language blockquote footer{margin-top:18px}
+  .flight-title h2{font-size:clamp(56px,11vw,104px)}
+  .flight-notes{display:grid;gap:9px}
+  .night .hold{grid-template-columns:1fr;gap:29px;padding-block:44px}
+  .night h2{font-size:clamp(51px,10.5vw,96px)}  .archive li a{grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;padding:16px 0}.archive time{grid-column:1/-1}
+}
+@media(max-width:760px){.language-copy{max-width:min(500px,100%)}}
+@media(max-width:360px){.mast nav{gap:9px}.language blockquote p{font-size:48px}}
+@media(max-height:470px){.motion .hold{position:relative}.motion .reel{min-height:auto}}
+@media(prefers-reduced-motion:reduce){.flight-notes ol{gap:10px}.flight-notes li{grid-area:auto;opacity:1;visibility:visible}.flight-title{opacity:1}}
+html:not(.motion) .flight-notes ol{gap:10px}
+html:not(.motion) .flight-notes li{grid-area:auto;opacity:1;visibility:visible}
+
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.chapter-link{border-color:#202a2355}
+.flight{background:#0b121c}
+/* Fine registration lines over a low horizon suggest a flight-test plate. */
+.copper{
+  --glow:#b99070;--air:#253e54;--night-sky:#101b2c;
+  background:
+    radial-gradient(ellipse at 75% calc(64% + var(--horizon-shift,0%)),var(--glow),transparent 36%),
+    linear-gradient(174deg,#0d1521 8%,var(--night-sky) 35%,var(--air) 63%,#132030 81%,#0c1521 100%);
+}
+.copper::after{
+  content:"";position:absolute;inset:0;opacity:.53;
+  background:linear-gradient(0deg,transparent,transparent 46%,#d7e0db47 47%,transparent 47.25%),
+    repeating-linear-gradient(90deg,transparent 0 73px,#b5ced119 74px,#b5ced119 75px),
+    repeating-linear-gradient(0deg,transparent 0 64px,#b5ced119 65px,#b5ced119 66px);
+  mask-image:radial-gradient(ellipse at 66% 52%,#000,transparent 75%);
+  background-position:0 var(--horizon-shift,0%),0 0,0 var(--horizon-shift,0%);
+}
+.flight[data-beat="2"] .copper{--glow:#b05d41;--air:#41404d;--night-sky:#1c2132}
+.flight-title{top:clamp(30px,5vh,65px);opacity:1;z-index:2}
+.flight-title p{font-size:clamp(71px,10vw,168px);letter-spacing:-.084em;font-weight:810;line-height:.83;margin-top:11px;white-space:nowrap;text-shadow:0 2px 28px #101619a0}
+.flight-title p span{color:#ee9c67}
+.flight-title .label{color:#dccab4}
+.flight-shade{background:linear-gradient(180deg,#0d1521e8,transparent 36%),linear-gradient(0deg,#0d1521 0%,#0d1521cc 16%,transparent 47%)}
+.airframe{inset:8% 0 10%}
+.flight-notes{z-index:3;align-items:end;background:linear-gradient(90deg,#0d1521a0,#0d152100 85%)}
+.flight-notes ol{font-size:clamp(18px,2vw,26px);font-weight:530;line-height:1.25}
+.flight-notes li{max-width:47ch}
+.flight-notes h3{font-size:13px}
+.flight-notes a{font-size:13px}
+.night .hold{background:radial-gradient(ellipse at 78% 47%,#213530,#132321 64%)}
+#night-contours{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:-1;pointer-events:none}
+.night-copy{background:radial-gradient(ellipse at 15% 60%,#152522ab,transparent 74%)}
+.hopper{z-index:1}
+.hopper .layers{box-shadow:0 16px 70px #0005}
+.hopper figcaption{background:#142522bc;padding:10px 0}
+@media(max-width:760px){
+  .flight-title p{font-size:clamp(61px,12vw,100px)}
+  .flight[data-beat="2"] .flight-title p{font-size:clamp(47px,10vw,80px)}
+  .airframe{inset:11% 0 14%}
+}
+@media(max-width:380px){.flight-title p{font-size:52px}.flight[data-beat="2"] .flight-title p{font-size:43px}}
+
+.about{
+  --opening-ground:#111b22;--opening-ink:#f3e8d3;--opening-accent:#dfba8b;--opening-rule:#e6d0a94d;
+  position:relative;isolation:isolate;display:grid;align-content:center;min-height:var(--screen);overflow:hidden;
+  padding:clamp(64px,9vh,144px) var(--gutter) clamp(98px,15vh,146px);
+  background:radial-gradient(ellipse at 83% 65%,#253539,transparent 54%),var(--opening-ground);
+  color:var(--opening-ink);
+}
+.about[data-opening="plate"]{
+  --opening-ground:#ece7d8;--opening-ink:#242a28;--opening-accent:#842f24;--opening-rule:#4a504452;
+  background:radial-gradient(ellipse at 86% 53%,#cccbb6,transparent 61%),var(--opening-ground);
+}
+.about[data-opening="thermal"]{
+  --opening-ground:#231924;--opening-ink:#fff0db;--opening-accent:#f3ad7d;--opening-rule:#f2bf9b4d;
+  background:radial-gradient(ellipse at 85% 50%,#4e283f,transparent 59%),var(--opening-ground);
+}
+#opening-field{position:absolute;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none}
+.about::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,var(--opening-ground) 5%,transparent 72%);
+}
+.about-intro{max-width:43rem}
+.about-byline{
+  display:table;color:var(--opening-accent);font-size:15px;font-weight:640;letter-spacing:.025em;
+  margin-bottom:clamp(21px,4vh,43px);padding-top:7px;border-top:1px solid var(--opening-rule);
+}
+.about h1{max-width:15ch;font-size:clamp(48px,6.9vw,90px);letter-spacing:-.067em;font-weight:760;line-height:1;text-wrap:balance}
+.about-copy{margin-top:clamp(14px,2.75vh,27px);font-size:clamp(18px,2vw,28px);line-height:1.3;letter-spacing:-.02em}
+.about-links{position:absolute;left:var(--gutter);right:var(--gutter);bottom:22px;border-top:1px solid var(--opening-rule);display:flex;gap:19px;justify-content:space-between}
+.about-links a{font-size:13px;font-weight:640;display:flex;align-items:center;gap:10px;padding:12px 0 0;text-decoration:none}
+.about-links a:hover{text-decoration:underline}
+.about-links span{font-size:16px;color:var(--opening-accent)}
+@media(max-width:760px){
+  .about{padding-block:80px 120px}
+  .about h1{font-size:clamp(43px,9.7vw,67px)}
+  .about::after{background:linear-gradient(0deg,var(--opening-ground),transparent 54%),linear-gradient(90deg,var(--opening-ground),transparent 83%)}
+}
+
+
+@media(max-width:540px){
+  .flight[data-beat="2"] .flight-title p{font-size:clamp(29px,10.1vw,54px)}
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 9;
+  inset: 8px auto auto 8px;
+  padding: .65rem 1rem;
+  background: #f3eee3;
+  color: #262219;
+  transform: translateY(calc(-100% - 12px));
+}
+.skip-link:focus { transform: none; }

@@ -1,0 +1,117 @@
+@font-face {
+  font-family: Archivo;
+  src: url('archivo.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  color-scheme: light;
+  --paper: #f3eee3;
+  --ink: #262219;
+  --muted: #655b4c;
+  --line: #cfc4b2;
+  --accent: #8d3220;
+  --gutter: clamp(1.25rem, 5vw, 4.75rem);
+  background: var(--paper);
+  color: var(--ink);
+  font: 100%/1.5 Archivo, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: .2em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+::selection { color: #251914; background: #f1bb92; }
+.masthead, .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-inline: var(--gutter);
+  padding-block: 1rem;
+  font-size: .875rem;
+}
+.masthead { min-height: 4.5rem; border-bottom: 1px solid var(--line); }
+.masthead a, .footer a { color: inherit; }
+.masthead .name { font-weight: 620; text-decoration: none; }
+.article { margin-inline: var(--gutter); }
+.lede { max-width: 79rem; margin: auto; }
+.lede-inner { position: relative; padding: clamp(3.25rem, 9vw, 7rem) 0 clamp(2rem, 5vw, 3.5rem); }
+.lede time {
+  color: var(--muted);
+  font: .8rem/1.3 ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+h1 {
+  max-width: 15ch;
+  margin: .34em 0 0;
+  font-size: clamp(2.75rem, 7.7vw, 7.75rem);
+  line-height: .95;
+  letter-spacing: -.067em;
+  font-weight: 650;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.spectrum {
+  width: min(100%, 79rem);
+  height: .55rem;
+  background: linear-gradient(98deg, #271e33, #534260 23%, #8d4056 45%, #c65347 67%, #e98653 84%, #f4c28e);
+  mask-image: radial-gradient(circle, #000 54%, transparent 65%);
+  mask-size: .34rem .34rem;
+}
+.reading-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 44rem) minmax(0, 15rem);
+  align-items: start;
+  gap: clamp(2.5rem, 7vw, 7rem);
+  max-width: 67rem;
+  margin: clamp(2.2rem, 5vw, 4.25rem) auto 0;
+}
+.essay {
+  min-width: 0;
+  font: clamp(1.08rem, 1.5vw, 1.26rem)/1.72 Georgia, serif;
+  overflow-wrap: break-word;
+}
+.essay > :first-child { margin-top: 0; }
+.essay p, .essay ul, .essay ol { margin: 0 0 1.22em; }
+.essay h2, .essay h3 { font-family: Archivo, Arial, sans-serif; line-height: 1.16; letter-spacing: -.035em; scroll-margin-top: 1.5rem; }
+.essay h2 { margin: 2.1em 0 .56em; font-size: clamp(1.7rem, 3vw, 2.65rem); }
+.essay h3 { margin: 1.75em 0 .7em; font-size: clamp(1.28rem, 2.1vw, 1.65rem); }
+.essay img { display: block; max-width: 100%; height: auto; margin: 1.65em auto .4em; }
+.essay code { font: .82em/1.5 ui-monospace, monospace; }
+.essay p code { padding: .12em .27em; background: #e8e0d2; border-radius: .15em; }
+.essay pre {
+  margin: 1.45em 0;
+  padding: clamp(.85rem, 3vw, 1.4rem);
+  overflow: auto;
+  background: #26232b;
+  color: #fcf3e0;
+  font: .86rem/1.65 ui-monospace, monospace;
+  border-radius: .25rem;
+}
+.essay pre code { font: inherit; }
+.toc { position: sticky; top: 2rem; border-top: 1px solid var(--line); padding-top: .75rem; }
+.toc summary { cursor: pointer; color: var(--muted); font-size: .83rem; }
+.toc ol { list-style: none; margin: .7rem 0 0; padding: 0; font-size: .9rem; }
+.toc li + li { margin-top: .58rem; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.footer { margin-top: clamp(3rem, 8vw, 7rem); border-top: 1px solid var(--line); padding-block: 1.5rem 2.5rem; }
+@media (max-width: 54rem) {
+  .reading-layout { display: flex; flex-direction: column; align-items: stretch; gap: 1.85rem; max-width: 44rem; }
+  .toc { position: static; order: -1; border-bottom: 1px solid var(--line); padding-bottom: .75rem; }
+}
+.essay div.highlighter-rouge { margin: 1.45em 0; }
+.essay .highlighter-rouge .highlight {
+  overflow: auto;
+  background: #26232b;
+  color: #fcf3e0;
+  border-radius: .25rem;
+}
+.essay .highlighter-rouge pre { margin: 0; }
+.essay .rouge-table { border-spacing: 0; }
+.essay .rouge-gutter { color: #c6bcae; }
+.essay .rouge-gutter pre { padding-right: 0; color: inherit; }
+.essay mjx-container[display="true"] { overflow: auto hidden; padding-block: .25em; }
+.essay table:not(.rouge-table) { display: block; max-width: 100%; overflow: auto; border-collapse: collapse; }
+.essay table:not(.rouge-table) :is(td, th) { padding: .4em .65em; border: 1px solid var(--line); }

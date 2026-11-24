@@ -1,0 +1,57 @@
+---
+---
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% seo %}
+  <link rel="alternate" type="application/atom+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/homepage/reading.css' | relative_url }}">
+  {% if site.toc and page.toc %}
+    <script defer src="{{ '/assets/homepage/reading.js' | relative_url }}"></script>
+  {% endif %}
+  {% if page.math %}
+    {% include origin-type.html %}
+    <script defer src="{{ '/assets/js/data/mathjax.js' | relative_url }}"></script>
+    <script defer id="MathJax-script" src="{{ site.data.origin[type].mathjax.js | relative_url }}"></script>
+  {% endif %}
+</head>
+<body>
+  <header class="masthead">
+    <a class="name" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
+    <nav aria-label="Blog"><a href="{{ '/#writing' | relative_url }}"><span aria-hidden="true">← </span>Writing</a></nav>
+  </header>
+  <main>
+    <article class="article" aria-labelledby="article-title">
+      <header class="lede">
+        <div class="lede-inner">
+          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%d %b %Y' }}</time>
+          <h1 id="article-title">{{ page.title | escape }}</h1>
+        </div>
+        <div class="spectrum" aria-hidden="true"></div>
+      </header>
+      <div class="reading-layout">
+        <div class="essay">
+          {{ content
+            | replace: '<div class="highlight"><pre class="highlight"><code', '<div class="highlight"><code'
+            | replace: '</code></pre></div>', '</code></div>'
+          }}
+        </div>
+        {% if site.toc and page.toc %}
+          <nav class="toc" aria-label="Article sections" hidden>
+            <details>
+              <summary>On this page</summary>
+              <ol></ol>
+            </details>
+          </nav>
+        {% endif %}
+      </div>
+    </article>
+  </main>
+  <footer class="footer">
+    <a href="{{ '/#writing' | relative_url }}"><span aria-hidden="true">← </span>All writing</a>
+    <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+  </footer>
+</body>
+</html>

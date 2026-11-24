@@ -1,0 +1,18 @@
+Lockheed SR-71 exterior airframe geometry by Emmanuel Baranger / FGAddon.
+The geometry and packed browser mesh are under GPL-2.0-or-later.
+
+Source release: https://sourceforge.net/p/flightgear/fgaddon/14985/
+Source path: Aircraft/Lockheed-SR71/AI/Aircraft/Lockheed-SR71/Models/sr71.ac
+Upstream project: https://wiki.flightgear.org/Lockheed_SR-71
+
+The browser mesh contains the fuselage and closed landing-gear doors.
+Textures, exterior graphics, and landing gear are omitted. The model source
+is model-source/sr71-ai.ac. The matching converter is model-source/pack-model.py.
+From this directory, regenerate the mesh with:
+
+    python3 model-source/pack-model.py model-source/sr71-ai.ac model.js
+
+The J58 cutaway and flow paths are illustrations. Reference: U.S. Air Force,
+figure 19, https://ntrs.nasa.gov/citations/20090007797 .
+
+License: model-LICENSE.txt.
