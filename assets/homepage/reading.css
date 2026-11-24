@@ -22,7 +22,7 @@ a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset:
 a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
 ::selection { color: #251914; background: #f1bb92; }
-.masthead, .footer {
+.masthead {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,11 +30,24 @@ a:hover { text-decoration-thickness: 2px; }
   margin-inline: var(--gutter);
   padding-block: 1rem;
   font-size: .875rem;
+  min-height: 4.5rem;
+  border-bottom: 1px solid var(--line);
 }
-.masthead { min-height: 4.5rem; border-bottom: 1px solid var(--line); }
-.masthead a, .footer a { color: inherit; }
-.masthead .name { font-weight: 620; text-decoration: none; }
-.article { margin-inline: var(--gutter); }
+.masthead .name { font-weight: 620; }
+.return-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 1rem;
+  border: 1px solid var(--ink);
+  border-radius: .25rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 620;
+  text-decoration: none;
+}
+.return-button:hover { background: var(--paper); color: var(--ink); }
+.article { margin-inline: var(--gutter); padding-bottom: clamp(3rem, 8vw, 7rem); }
 .lede { max-width: 79rem; margin: auto; }
 .lede-inner { position: relative; padding: clamp(3.25rem, 9vw, 7rem) 0 clamp(2rem, 5vw, 3.5rem); }
 .lede time {
@@ -62,12 +75,14 @@ h1 {
 .reading-layout {
   display: grid;
   grid-template-columns: minmax(0, 44rem) minmax(0, 15rem);
+  grid-template-areas: "essay contents";
   align-items: start;
   gap: clamp(2.5rem, 7vw, 7rem);
   max-width: 67rem;
   margin: clamp(2.2rem, 5vw, 4.25rem) auto 0;
 }
 .essay {
+  grid-area: essay;
   min-width: 0;
   font: clamp(1.08rem, 1.5vw, 1.26rem)/1.72 Georgia, serif;
   overflow-wrap: break-word;
@@ -90,16 +105,21 @@ h1 {
   border-radius: .25rem;
 }
 .essay pre code { font: inherit; }
-.toc { position: sticky; top: 2rem; border-top: 1px solid var(--line); padding-top: .75rem; }
-.toc summary { cursor: pointer; color: var(--muted); font-size: .83rem; }
-.toc ol { list-style: none; margin: .7rem 0 0; padding: 0; font-size: .9rem; }
-.toc li + li { margin-top: .58rem; }
-.toc a { color: var(--ink); text-decoration: none; }
-.toc a:hover { text-decoration: underline; }
-.footer { margin-top: clamp(3rem, 8vw, 7rem); border-top: 1px solid var(--line); padding-block: 1.5rem 2.5rem; }
+.toc {
+  grid-area: contents;
+  position: sticky;
+  top: 2rem;
+  border-top: 1px solid var(--line);
+  padding-top: .65rem;
+}
+.toc h2 { margin: 0 0 .5rem; color: var(--muted); font-size: .8125rem; font-weight: 650; }
+.toc ol { display: grid; gap: .35rem; list-style: none; margin: 0; padding: 0; font-size: .875rem; line-height: 1.35; }
+.toc a { display: block; padding-block: .15rem; color: var(--ink); text-decoration: none; }
+.toc a:hover, .toc a:focus-visible { text-decoration: underline; }
 @media (max-width: 54rem) {
-  .reading-layout { display: flex; flex-direction: column; align-items: stretch; gap: 1.85rem; max-width: 44rem; }
-  .toc { position: static; order: -1; border-bottom: 1px solid var(--line); padding-bottom: .75rem; }
+  .reading-layout { display: flex; flex-direction: column; align-items: stretch; gap: 1.5rem; max-width: 44rem; }
+  .toc { position: static; border-bottom: 1px solid var(--line); padding-bottom: .65rem; }
+  .toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1rem; }
 }
 .essay div.highlighter-rouge { margin: 1.45em 0; }
 .essay .highlighter-rouge .highlight {

@@ -28,8 +28,6 @@ section[id]{scroll-margin-top:var(--mast)}
 .language blockquote p{font:italic clamp(57px,7.9vw,128px)/.83 Instrument,Georgia,serif;letter-spacing:-.024em}
 .language em{color:#243432}
 .language blockquote footer{font-size:13px;margin-top:26px;color:#2d3c3a}
-.chapter-link{position:absolute;left:var(--gutter);right:var(--gutter);bottom:27px;display:flex;justify-content:space-between;align-items:center;text-decoration:none;border-top:1px solid #e0e9a747;padding-top:11px;font-size:13px}
-.chapter-link span{font-size:20px}
 .flight{--travel:250svh;background:#241a1e;color:#fff1db}
 .flight .hold{height:max(490px,var(--screen));overflow:hidden;isolation:isolate}
 .copper,.airframe,.flight-shade{position:absolute;inset:0;pointer-events:none}
@@ -50,7 +48,6 @@ section[id]{scroll-margin-top:var(--mast)}
 .flight-notes li{grid-area:1/1;opacity:0;visibility:hidden;max-width:40ch}
 .flight-notes li[data-active]{opacity:1;visibility:visible}
 .flight-notes h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px;color:#fcd5a3}
-.flight-notes a{font-size:12px;white-space:nowrap}
 .night{background:#132321;color:#f3e2c6;--travel:0px}
 .night .hold{overflow:hidden;isolation:isolate;display:grid;align-content:center;padding:clamp(32px,6vh,75px) var(--gutter);grid-template-columns:minmax(255px,.74fr) minmax(0,1fr);column-gap:clamp(28px,5vw,100px)}
 .night-copy{align-self:center;z-index:1}
@@ -66,10 +63,9 @@ section[id]{scroll-margin-top:var(--mast)}
 .archive h2{font-size:clamp(54px,8vw,122px);letter-spacing:-.073em;line-height:.9}
 .archive ol{list-style:none;padding:0;border-top:1px solid #302f2f}
 .archive li{border-bottom:1px solid #302f2f66}
-.archive li a{display:grid;grid-template-columns:8rem minmax(0,1fr) auto;align-items:baseline;gap:17px;padding:20px 0;text-decoration:none;font-size:clamp(17px,2.4vw,31px);line-height:1.22;letter-spacing:-.024em}
+.archive li a{display:grid;grid-template-columns:8rem minmax(0,1fr);align-items:baseline;gap:17px;padding:20px 0;text-decoration:none;font-size:clamp(17px,2.4vw,31px);line-height:1.22;letter-spacing:-.024em}
 .archive li a:hover span:first-of-type{text-decoration:underline}
-.archive time,.archive footer{font-size:13px;letter-spacing:0}
-.archive footer{display:flex;flex-wrap:wrap;gap:12px 25px;margin-top:28px}
+.archive time{font-size:13px;letter-spacing:0}
 @media(max-width:760px){
   :root{--mast:51px;--gutter:22px}
   .mast{padding:0 14px;gap:9px}.signature{font-size:12px}.mast nav{gap:12px;font-size:11px}
@@ -80,7 +76,7 @@ section[id]{scroll-margin-top:var(--mast)}
   .flight-title h2{font-size:clamp(56px,11vw,104px)}
   .flight-notes{display:grid;gap:9px}
   .night .hold{grid-template-columns:1fr;gap:29px;padding-block:44px}
-  .night h2{font-size:clamp(51px,10.5vw,96px)}  .archive li a{grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;padding:16px 0}.archive time{grid-column:1/-1}
+  .night h2{font-size:clamp(51px,10.5vw,96px)}  .archive li a{grid-template-columns:minmax(0,1fr);gap:4px;padding:16px 0}.archive time{grid-column:1/-1}
 }
 @media(max-width:760px){.language-copy{max-width:min(500px,100%)}}
 @media(max-width:360px){.mast nav{gap:9px}.language blockquote p{font-size:48px}}
@@ -91,7 +87,6 @@ html:not(.motion) .flight-notes li{grid-area:auto;opacity:1;visibility:visible}
 
 
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.chapter-link{border-color:#202a2355}
 .flight{background:#0b121c}
 /* Fine registration lines over a low horizon suggest a flight-test plate. */
 .copper{
@@ -119,7 +114,6 @@ html:not(.motion) .flight-notes li{grid-area:auto;opacity:1;visibility:visible}
 .flight-notes ol{font-size:clamp(18px,2vw,26px);font-weight:530;line-height:1.25}
 .flight-notes li{max-width:47ch}
 .flight-notes h3{font-size:13px}
-.flight-notes a{font-size:13px}
 .night .hold{background:radial-gradient(ellipse at 78% 47%,#213530,#132321 64%)}
 #night-contours{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:-1;pointer-events:none}
 .night-copy{background:radial-gradient(ellipse at 15% 60%,#152522ab,transparent 74%)}
@@ -160,10 +154,6 @@ html:not(.motion) .flight-notes li{grid-area:auto;opacity:1;visibility:visible}
 }
 .about h1{max-width:15ch;font-size:clamp(48px,6.9vw,90px);letter-spacing:-.067em;font-weight:760;line-height:1;text-wrap:balance}
 .about-copy{margin-top:clamp(14px,2.75vh,27px);font-size:clamp(18px,2vw,28px);line-height:1.3;letter-spacing:-.02em}
-.about-links{position:absolute;left:var(--gutter);right:var(--gutter);bottom:22px;border-top:1px solid var(--opening-rule);display:flex;gap:19px;justify-content:space-between}
-.about-links a{font-size:13px;font-weight:640;display:flex;align-items:center;gap:10px;padding:12px 0 0;text-decoration:none}
-.about-links a:hover{text-decoration:underline}
-.about-links span{font-size:16px;color:var(--opening-accent)}
 @media(max-width:760px){
   .about{padding-block:80px 120px}
   .about h1{font-size:clamp(43px,9.7vw,67px)}

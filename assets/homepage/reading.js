@@ -1,7 +1,7 @@
 (() => {
   const contents = document.querySelector('.toc');
   const headings = document.querySelectorAll('.essay h2[id]');
-  if (!contents || headings.length < 3) return;
+  if (!contents || headings.length === 0) return;
 
   const list = contents.querySelector('ol');
   for (const heading of headings) {

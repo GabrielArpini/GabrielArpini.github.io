@@ -10,7 +10,7 @@ description: Writing on AI inference, with studies in language, flight, and Edwa
   <meta name="viewport" content="width=device-width,initial-scale=1">
   {% seo %}
   <link rel="alternate" type="application/atom+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/homepage/style.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/homepage/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   <script defer src="{{ '/assets/homepage/land.js' | relative_url }}"></script>
   <script defer src="{{ '/assets/homepage/three.min.js' | relative_url }}"></script>
   <script defer src="{{ '/assets/homepage/model.js' | relative_url }}"></script>
@@ -35,10 +35,6 @@ description: Writing on AI inference, with studies in language, flight, and Edwa
         <h1 id="about-title">I look things up.</h1>
         <p class="about-copy">Sometimes I write about them.</p>
       </div>
-      <div class="about-links">
-        <a href="#language">Start with language <span aria-hidden="true">↓</span></a>
-        <a href="#writing">Read the blog <span aria-hidden="true">↘</span></a>
-      </div>
     </section>
 
     <section id="language" class="reel language">
@@ -51,7 +47,6 @@ description: Writing on AI inference, with studies in language, flight, and Edwa
             <footer><a href="https://www.gutenberg.org/files/5740/5740-pdf.pdf">Ludwig Wittgenstein · <i>Tractatus</i>, §5.6</a></footer>
           </blockquote>
         </div>
-        <a class="chapter-link" href="#flight">First principles <span aria-hidden="true">↓</span></a>
       </div>
     </section>
 
@@ -71,7 +66,6 @@ description: Writing on AI inference, with studies in language, flight, and Edwa
             <li data-flight-beat="1"><h3>Airframe aerodynamics</h3><p>Follow the air around the nose, over the chines and wings, and into the wake.</p></li>
             <li data-flight-beat="2"><h3>Airflow</h3><p>The compressor squeezes the core flow. The heated exhaust speeds through the nozzle.</p></li>
           </ol>
-          <a href="https://ntrs.nasa.gov/api/citations/20090007797/downloads/20090007797.pdf#page=24">U.S. Air Force · Figure 19 <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </section>
@@ -103,18 +97,10 @@ description: Writing on AI inference, with studies in language, flight, and Edwa
             <a href="{{ post.url | relative_url }}">
               <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%d %b %Y' }}</time>
               <span>{{ post.title | escape }}</span>
-              <span aria-hidden="true">→</span>
             </a>
           </li>
         {% endfor %}
       </ol>
-      <footer>
-        <a href="{{ '/archives/' | relative_url }}">Archive</a>
-        <a href="https://github.com/GabrielArpini">GitHub</a>
-        <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
-        <a href="{{ '/assets/homepage/MODEL.txt' | relative_url }}">SR‑71 mesh · FGAddon</a>
-        <a href="https://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-land/">Map · Natural Earth</a>
-      </footer>
     </section>
   </main>
 </body>

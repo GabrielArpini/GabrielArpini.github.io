@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% seo %}
   <link rel="alternate" type="application/atom+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/homepage/reading.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/homepage/reading.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   {% if site.toc and page.toc %}
-    <script defer src="{{ '/assets/homepage/reading.js' | relative_url }}"></script>
+    <script defer src="{{ '/assets/homepage/reading.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
   {% endif %}
   {% if page.math %}
     {% include origin-type.html %}
@@ -19,8 +19,8 @@
 </head>
 <body>
   <header class="masthead">
-    <a class="name" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
-    <nav aria-label="Blog"><a href="{{ '/#writing' | relative_url }}"><span aria-hidden="true">← </span>Writing</a></nav>
+    <span class="name">{{ site.title | escape }}</span>
+    <nav aria-label="Blog"><a class="return-button" href="{{ '/#writing' | relative_url }}">Return</a></nav>
   </header>
   <main>
     <article class="article" aria-labelledby="article-title">
@@ -32,26 +32,20 @@
         <div class="spectrum" aria-hidden="true"></div>
       </header>
       <div class="reading-layout">
+        {% if site.toc and page.toc %}
+          <nav class="toc" aria-labelledby="toc-title" hidden>
+            <h2 id="toc-title">Contents</h2>
+            <ol></ol>
+          </nav>
+        {% endif %}
         <div class="essay">
           {{ content
             | replace: '<div class="highlight"><pre class="highlight"><code', '<div class="highlight"><code'
             | replace: '</code></pre></div>', '</code></div>'
           }}
         </div>
-        {% if site.toc and page.toc %}
-          <nav class="toc" aria-label="Article sections" hidden>
-            <details>
-              <summary>On this page</summary>
-              <ol></ol>
-            </details>
-          </nav>
-        {% endif %}
       </div>
     </article>
   </main>
-  <footer class="footer">
-    <a href="{{ '/#writing' | relative_url }}"><span aria-hidden="true">← </span>All writing</a>
-    <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
-  </footer>
 </body>
 </html>
